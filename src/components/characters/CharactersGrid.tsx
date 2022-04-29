@@ -1,31 +1,29 @@
-import { useEffect } from 'react';
+import { useCharacters } from '../../hooks/useCharacters';
 import { CharacterItem } from './CharacterItem';
 
 export const CharactersGrid = () => {
-  const getCharacters = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/v1/public/characters?apikey=${
-          import.meta.env.VITE_API_KEY
-        }`
-      );
+  const { characters, error, loading } = useCharacters();
 
-      const { data } = await res.json();
+  if (loading) {
+    return (
+      <>
+        <h2 className='font-bold'>Loading...</h2>
+      </>
+    );
+  }
 
-      console.log(data);
-    } catch (error) {
-      console.log({ error });
-    }
-  };
-
-  useEffect(() => {
-    getCharacters();
-  }, []);
+  if (error) {
+    return (
+      <>
+        <h2 className='bg-red-800 text-white'>Error</h2>
+      </>
+    );
+  }
 
   return (
     <div className='px-10 grid grid-cols-auto-fill mt-10 gap-6 dark:text-black'>
-      {[1, 2, 3, 4, 5, 6, 7, 8].map(character => (
-        <CharacterItem key={character} />
+      {characters.map(character => (
+        <CharacterItem key={character.id} />
       ))}
     </div>
   );
