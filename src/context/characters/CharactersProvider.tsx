@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import type {
   CharactersResponse,
   ICharacters,
@@ -9,12 +9,16 @@ export interface charactersState {
   characters: ICharacters[];
   loading: boolean;
   error: boolean;
+  offset: number;
+  totalCharacters: number;
 }
 
 const Characters_INITIAL_STATE: charactersState = {
   characters: [],
   error: false,
   loading: true,
+  offset: 0,
+  totalCharacters: 0,
 };
 
 interface Props {
@@ -26,20 +30,31 @@ interface CharactersDataResponse {
 }
 
 export const CharactersProvider = ({ children }: Props) => {
+  const isFirstRender = useRef<boolean>(true);
   const [state, dispatch] = useReducer(
     charactersReducer,
     Characters_INITIAL_STATE
   );
 
-  const getCharacters = async () => {
+  const { offset, totalCharacters } = state;
+
+  const getCharacters = async (offset: number) => {
     try {
+      dispatch({ type: 'add-loading' });
       const res = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/v1/public/characters?apikey=${
+        `${
+          import.meta.env.VITE_BASE_URL
+        }/v1/public/characters?offset=${offset}&apikey=${
           import.meta.env.VITE_API_KEY
         }`
       );
 
       const { data }: CharactersDataResponse = await res.json();
+
+      if (isFirstRender.current) {
+        dispatch({ type: 'set-totalCharacters', payload: data.total });
+        isFirstRender.current = false;
+      }
 
       dispatch({ type: 'load-characters', payload: data.results });
     } catch (error) {
@@ -49,14 +64,27 @@ export const CharactersProvider = ({ children }: Props) => {
     }
   };
 
+  const handlePreviousPage = () => {
+    const previous = offset <= 0 ? 0 : offset - 20;
+    dispatch({ type: 'previous-page', payload: previous });
+  };
+
+  const handleNextPage = () => {
+    const next =
+      offset >= totalCharacters ? totalCharacters - offset : offset + 20;
+    dispatch({ type: 'next-page', payload: next });
+  };
+
   useEffect(() => {
-    getCharacters();
-  }, []);
+    getCharacters(offset);
+  }, [offset]);
 
   return (
     <CharactersContext.Provider
       value={{
         ...state,
+        handlePreviousPage,
+        handleNextPage,
       }}
     >
       {children}
