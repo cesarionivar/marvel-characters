@@ -4,7 +4,11 @@ import { charactersState } from './';
 type charactersActionType =
   | { type: 'load-characters'; payload: ICharacters[] }
   | { type: 'add-error' }
-  | { type: 'remove-loading' };
+  | { type: 'add-loading' }
+  | { type: 'remove-loading' }
+  | { type: 'set-totalCharacters'; payload: number }
+  | { type: 'previous-page'; payload: number }
+  | { type: 'next-page'; payload: number };
 
 export const charactersReducer = (
   state: charactersState,
@@ -24,10 +28,34 @@ export const charactersReducer = (
         error: true,
       };
 
+    case 'add-loading':
+      return {
+        ...state,
+        loading: true,
+      };
+
     case 'remove-loading':
       return {
         ...state,
         loading: false,
+      };
+
+    case 'set-totalCharacters':
+      return {
+        ...state,
+        totalCharacters: action.payload,
+      };
+
+    case 'previous-page':
+      return {
+        ...state,
+        offset: action.payload,
+      };
+
+    case 'next-page':
+      return {
+        ...state,
+        offset: action.payload,
       };
 
     default:
