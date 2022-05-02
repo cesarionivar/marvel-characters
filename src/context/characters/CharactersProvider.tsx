@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type {
   CharactersResponse,
   ICharacters,
@@ -30,6 +31,7 @@ interface CharactersDataResponse {
 }
 
 export const CharactersProvider = ({ children }: Props) => {
+  const [params, setParams] = useSearchParams();
   const isFirstRender = useRef<boolean>(true);
   const [state, dispatch] = useReducer(
     charactersReducer,
@@ -62,6 +64,17 @@ export const CharactersProvider = ({ children }: Props) => {
     } finally {
       dispatch({ type: 'remove-loading' });
     }
+  };
+
+  const getOffsetByPage = () => {
+    let page: number = parseInt(params.get('page') ?? '1');
+    if (isNaN(page) || page < 1) {
+      setParams({ page: '1' });
+      page = 1;
+    }
+
+    const offsetByPage = page * 20 - 20;
+    dispatch({ type: 'set-offset', payload: offsetByPage });
   };
 
   const handlePreviousPage = () => {
