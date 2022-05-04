@@ -6,6 +6,9 @@ import type {
 } from '../../interfaces/charactersResponse';
 import { CharactersContext, charactersReducer } from './';
 
+const TEMP_TOTAL_RESULTS = 1562;
+const CHARACTERS_LIMIT = 20;
+
 export interface charactersState {
   characters: ICharacters[];
   loading: boolean;
@@ -19,7 +22,7 @@ const Characters_INITIAL_STATE: charactersState = {
   error: false,
   loading: true,
   offset: 0,
-  totalCharacters: 0,
+  totalCharacters: TEMP_TOTAL_RESULTS,
 };
 
 interface Props {
@@ -29,9 +32,6 @@ interface Props {
 interface CharactersDataResponse {
   data: CharactersResponse;
 }
-
-const TEMP_TOTAL_RESULTS = 1562;
-const CHARACTERS_LIMIT = 20;
 
 export const CharactersProvider = ({ children }: Props) => {
   const [params, setParams] = useSearchParams();
