@@ -1,4 +1,5 @@
 import { useEffect, useReducer, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type {
   CharactersResponse,
   ICharacters,
@@ -30,6 +31,7 @@ interface CharactersDataResponse {
 }
 
 export const CharactersProvider = ({ children }: Props) => {
+  const [params, setParams] = useSearchParams();
   const isFirstRender = useRef<boolean>(true);
   const [state, dispatch] = useReducer(
     charactersReducer,
@@ -64,19 +66,36 @@ export const CharactersProvider = ({ children }: Props) => {
     }
   };
 
+  const getCharactersByOffset = () => {
+    let page: number = parseInt(params.get('page') ?? '1');
+    if (isNaN(page) || page < 1) {
+      setParams({ page: '1' });
+      page = 1;
+    }
+
+    const offsetByPage = page * 20 - 20;
+
+    getCharacters(offsetByPage);
+    dispatch({ type: 'set-offset', payload: offsetByPage });
+  };
+
   const handlePreviousPage = () => {
     const previous = offset <= 0 ? 0 : offset - 20;
+    const page = previous / 20 + 1;
+    setParams({ page: `${page}` });
     dispatch({ type: 'previous-page', payload: previous });
   };
 
   const handleNextPage = () => {
     const next =
       offset >= totalCharacters ? totalCharacters - offset : offset + 20;
+    const page = next / 20 + 1;
+    setParams({ page: `${page}` });
     dispatch({ type: 'next-page', payload: next });
   };
 
   useEffect(() => {
-    getCharacters(offset);
+    getCharactersByOffset();
   }, [offset]);
 
   return (

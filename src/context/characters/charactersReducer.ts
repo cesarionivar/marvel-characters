@@ -7,6 +7,7 @@ type charactersActionType =
   | { type: 'add-loading' }
   | { type: 'remove-loading' }
   | { type: 'set-totalCharacters'; payload: number }
+  | { type: 'set-offset'; payload: number }
   | { type: 'previous-page'; payload: number }
   | { type: 'next-page'; payload: number };
 
@@ -44,6 +45,12 @@ export const charactersReducer = (
       return {
         ...state,
         totalCharacters: action.payload,
+      };
+
+    case 'set-offset':
+      return {
+        ...state,
+        offset: action.payload,
       };
 
     case 'previous-page':
