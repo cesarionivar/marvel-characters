@@ -6,6 +6,9 @@ import type {
 } from '../../interfaces/charactersResponse';
 import { CharactersContext, charactersReducer } from './';
 
+const TEMP_TOTAL_RESULTS = 1562;
+const CHARACTERS_LIMIT = 20;
+
 export interface charactersState {
   characters: ICharacters[];
   loading: boolean;
@@ -19,7 +22,7 @@ const Characters_INITIAL_STATE: charactersState = {
   error: false,
   loading: true,
   offset: 0,
-  totalCharacters: 0,
+  totalCharacters: TEMP_TOTAL_RESULTS,
 };
 
 interface Props {
@@ -68,28 +71,34 @@ export const CharactersProvider = ({ children }: Props) => {
 
   const getCharactersByOffset = () => {
     let page: number = parseInt(params.get('page') ?? '1');
-    if (isNaN(page) || page < 1) {
+    if (
+      isNaN(page) ||
+      page < 1 ||
+      page > TEMP_TOTAL_RESULTS / CHARACTERS_LIMIT
+    ) {
       setParams({ page: '1' });
       page = 1;
     }
 
-    const offsetByPage = page * 20 - 20;
+    const offsetByPage = page * CHARACTERS_LIMIT - CHARACTERS_LIMIT;
 
     getCharacters(offsetByPage);
     dispatch({ type: 'set-offset', payload: offsetByPage });
   };
 
   const handlePreviousPage = () => {
-    const previous = offset <= 0 ? 0 : offset - 20;
-    const page = previous / 20 + 1;
+    const previous = offset <= 0 ? 0 : offset - CHARACTERS_LIMIT;
+    const page = previous / CHARACTERS_LIMIT + 1;
     setParams({ page: `${page}` });
     dispatch({ type: 'previous-page', payload: previous });
   };
 
   const handleNextPage = () => {
     const next =
-      offset >= totalCharacters ? totalCharacters - offset : offset + 20;
-    const page = next / 20 + 1;
+      offset >= totalCharacters
+        ? totalCharacters - offset
+        : offset + CHARACTERS_LIMIT;
+    const page = next / CHARACTERS_LIMIT + 1;
     setParams({ page: `${page}` });
     dispatch({ type: 'next-page', payload: next });
   };
