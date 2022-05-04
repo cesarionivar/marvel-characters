@@ -66,7 +66,7 @@ export const CharactersProvider = ({ children }: Props) => {
     }
   };
 
-  const getOffsetByPage = () => {
+  const getCharactersByOffset = () => {
     let page: number = parseInt(params.get('page') ?? '1');
     if (isNaN(page) || page < 1) {
       setParams({ page: '1' });
@@ -74,6 +74,8 @@ export const CharactersProvider = ({ children }: Props) => {
     }
 
     const offsetByPage = page * 20 - 20;
+
+    getCharacters(offsetByPage);
     dispatch({ type: 'set-offset', payload: offsetByPage });
   };
 
@@ -93,7 +95,7 @@ export const CharactersProvider = ({ children }: Props) => {
   };
 
   useEffect(() => {
-    getCharacters(offset);
+    getCharactersByOffset();
   }, [offset]);
 
   return (
