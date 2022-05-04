@@ -1,6 +1,7 @@
 import { useCharacters } from '../../hooks/useCharacters';
 import { Error, Loader, Pagination } from '../ui';
 import { CharacterItem } from './CharacterItem';
+import { SearchCharacters } from './SearchCharacters';
 
 export const CharactersGrid = () => {
   const { characters, error, loading } = useCharacters();
@@ -9,6 +10,8 @@ export const CharactersGrid = () => {
 
   return (
     <div className='px-6 sm:px-20 my-10'>
+      <SearchCharacters />
+
       <Pagination />
       {loading ? (
         <Loader />
