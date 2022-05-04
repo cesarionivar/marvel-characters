@@ -79,12 +79,16 @@ export const CharactersProvider = ({ children }: Props) => {
 
   const handlePreviousPage = () => {
     const previous = offset <= 0 ? 0 : offset - 20;
+    const page = previous / 20 + 1;
+    setParams({ page: `${page}` });
     dispatch({ type: 'previous-page', payload: previous });
   };
 
   const handleNextPage = () => {
     const next =
       offset >= totalCharacters ? totalCharacters - offset : offset + 20;
+    const page = next / 20 + 1;
+    setParams({ page: `${page}` });
     dispatch({ type: 'next-page', payload: next });
   };
 
