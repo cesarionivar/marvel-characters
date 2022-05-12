@@ -43,16 +43,21 @@ export const CharactersProvider = ({ children }: Props) => {
 
   const { offset, totalCharacters } = state;
 
-  const getCharacters = async (offset: number) => {
+  const getCharacters = async (offset: number, searchTerm = '') => {
     try {
       dispatch({ type: 'add-loading' });
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_BASE_URL
-        }/v1/public/characters?offset=${offset}&apikey=${
-          import.meta.env.VITE_API_KEY
-        }`
-      );
+
+      const baseUrl = `${
+        import.meta.env.VITE_BASE_URL
+      }/v1/public/characters?offset=${offset}&apikey=${
+        import.meta.env.VITE_API_KEY
+      }`;
+
+      const charactersEndpoint = searchTerm
+        ? `${baseUrl}&nameStartsWith=${searchTerm}`
+        : baseUrl;
+
+      const res = await fetch(charactersEndpoint);
 
       const { data }: CharactersDataResponse = await res.json();
 
@@ -86,6 +91,10 @@ export const CharactersProvider = ({ children }: Props) => {
     dispatch({ type: 'set-offset', payload: offsetByPage });
   };
 
+  const getCharactersBySearchTerm = (searchTerm: string) => {
+    getCharacters(0, searchTerm);
+  };
+
   const handlePreviousPage = () => {
     const previous = offset <= 0 ? 0 : offset - CHARACTERS_LIMIT;
     const page = previous / CHARACTERS_LIMIT + 1;
@@ -113,6 +122,7 @@ export const CharactersProvider = ({ children }: Props) => {
         ...state,
         handlePreviousPage,
         handleNextPage,
+        getCharactersBySearchTerm,
       }}
     >
       {children}
