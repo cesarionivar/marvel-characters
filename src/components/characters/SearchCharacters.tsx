@@ -1,17 +1,11 @@
-import { useState } from 'react';
+import { useCharacters } from '../../hooks/useCharacters';
 
 export const SearchCharacters = () => {
-  const [form, setForm] = useState({
-    searchTerm: '',
-  });
+  const { getCharactersBySearchTerm } = useCharacters();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-
-    console.log(form);
+    const currentValue = e.target.value;
+    getCharactersBySearchTerm(currentValue);
   };
 
   return (
@@ -22,9 +16,8 @@ export const SearchCharacters = () => {
             Search by name:
           </label>
           <input
-            type='searchTerm'
+            type='search'
             onChange={handleChange}
-            name='searchTerm'
             id='searchTerm'
             placeholder='Spider Man'
             className='px-2 py-2 rounded'
